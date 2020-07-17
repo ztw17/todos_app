@@ -43,31 +43,47 @@ class TodosContainer extends Component {
     }    
   }
 
+  updateTodo = (event, id) => {
+    axios.put(`/api/v1/todos/${id}`, {todo: {done: event.target.checked}})
+    .then(response => {
+      const todoIndex = this.state.todos.findIndex(x => x.id === response.data.id)
+      const todos = update(this.state.todos, {
+        [todoIndex]: {$set: response.data}
+      })
+      this.setState({
+        todos: todos
+      })
+    })
+    .catch(error => console.log(error))      
+  }
+
   render() {
     return (
-      <div>
-        <div className="inputContainer">
-          <input className="taskInput" type="text" 
-            placeholder="Add a task" maxLength="50"
-            onKeyPress={this.createTodo} 
-            value={this.state.inputValue} onChange={this.handleChange} />
-        </div>  	    
-	<div className="listWrapper">
-	   <ul className="taskList">
-		  {this.state.todos.map((todo) => {
-		    return(
-		      <li className="task" todo={todo} key={todo.id}>
-			<input className="taskCheckbox" type="checkbox" />              
-			<label className="taskLabel">{todo.title}</label>
-			<span className="deleteTaskBtn">x</span>
-		      </li>
-		    )       
-		  })} 	    
-	   </ul>
-	</div>
-     </div>
-    )
-  }
+        <div>
+            <div className="inputContainer">
+                <input className="taskInput" type="text" 
+                    placeholder="Add a task" maxLength="50"
+                    onKeyPress={this.createTodo} 
+                    value={this.state.inputValue} onChange={this.handleChange} />
+            </div>  	    
+            <div className="listWrapper">
+                <ul className="taskList">
+                    {this.state.todos.map((todo) => {
+                        return(
+                            <li className="task" todo={todo} key={todo.id}>
+                                <input className="taskCheckbox" type="checkbox" 
+                                    checked={todo.done}
+                                    onChange={(e) => this.updateTodo(e, todo.id)} />               
+                                <label className="taskLabel">{todo.title}</label>
+                                <span className="deleteTaskBtn">x</span>
+                            </li>
+                        )       
+                    })} 	    
+                </ul>
+            </div>
+        </div>
+        )
+    }
 }
 
 export default TodosContainer
